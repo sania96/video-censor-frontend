@@ -1,0 +1,123 @@
+/* frontend/src/UploadPage.module.css */
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem;
+  background-color: #f8f9fa;
+  font-family: 'Arial', sans-serif;
+}
+
+.title {
+  color: #343a40;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+}
+
+.uploadContainer {
+  background-color: #fff;
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  width: 80%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fileInput {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.uploadButton {
+  background-color: #007bff;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.uploadButton:hover {
+  background-color: #0056b3;
+}
+
+.uploadButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  margin-top: 1rem;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.processingMessage {
+  margin-top: 1rem;
+  color: #28a745;
+  font-weight: bold;
+}
+
+.downloadContainer {
+  margin-top: 3rem;
+  background-color: #fff;
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.downloadTitle {
+  color: #343a40;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.downloadButton {
+  background-color: #28a745;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.downloadButton:hover {
+  background-color: #1e7e34;
+}
+
+.downloadButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.downloadLink {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.styledLink {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.styledLink:hover {
+  text-decoration: underline;
+}
