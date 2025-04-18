@@ -1,7 +1,7 @@
 // frontend/src/UploadPage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './UploadPage.module.css'; // Import the CSS module
+import styles from './UploadPage.module.css';
 
 function UploadPage() {
   const [videoFile, setVideoFile] = useState(null);
@@ -25,6 +25,14 @@ function UploadPage() {
     setProcessedS3Key('');
   };
 
+  const sanitizeFilename = (name) => {
+    const cleanName = name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const timestamp = Date.now();
+    const ext = cleanName.includes('.') ? cleanName.substring(cleanName.lastIndexOf('.')) : '';
+    const base = cleanName.replace(ext, '');
+    return `${base}_${timestamp}${ext}`;
+  };
+
   const handleUpload = async () => {
     if (!videoFile) {
       setUploadError("Please select a video!");
@@ -36,43 +44,30 @@ function UploadPage() {
     setDownloadUrl('');
     setProcessedS3Key('');
 
-    console.log("Initiating upload and process...");
-    console.log("API Endpoint for pre-signed URL:", `${API_BASE_URL}/generate-presigned-upload-url?filename=${videoFile.name}`);
+    const sanitizedFilename = sanitizeFilename(videoFile.name);
 
     try {
-      // Step 1: Get pre-signed URL for upload
-      const { data: presignedData } = await axios.get(`${API_BASE_URL}/generate-presigned-upload-url?filename=${videoFile.name}`);
+      const { data: presignedData } = await axios.get(`${API_BASE_URL}/generate-presigned-upload-url?filename=${sanitizedFilename}`);
       const presignedUrl = presignedData.url;
-      console.log("Pre-signed upload URL received:", presignedUrl);
 
-      // Step 2: Upload directly to S3
-      console.log("Uploading to S3 with URL:", presignedUrl);
       await axios.put(presignedUrl, videoFile, {
-        headers: {
-          'Content-Type': videoFile.type
-        }
+        headers: { 'Content-Type': videoFile.type }
       });
-      console.log("Video uploaded to S3 successfully.");
 
-      // Step 3: Tell backend to process and get the S3 key
-      console.log("Sending request to process video:", `${API_BASE_URL}/upload`);
       const { data: processResponse } = await axios.post(`${API_BASE_URL}/upload`, {
-        file_name: videoFile.name,
+        file_name: sanitizedFilename,
       });
-      console.log("Processing request successful. Response:", processResponse);
 
       setProcessedS3Key(processResponse.output_video_s3_key);
       alert("Video processed successfully! A download link will appear below.");
-      // Immediately fetch the download URL after successful processing
+
       const { data: downloadData } = await axios.get(`${API_BASE_URL}/download-s3-url?s3_key=${processResponse.output_video_s3_key}`);
       setDownloadUrl(downloadData.url);
-      console.log("Download URL received:", downloadData.url);
 
     } catch (error) {
       console.error('Upload failed:', error);
       if (error.response) {
         setUploadError(`Error processing video: ${error.response.data?.message || error.response.statusText}`);
-        console.error('Server response:', error.response.data);
       } else if (error.request) {
         setUploadError('Error connecting to the server.');
       } else {
@@ -80,18 +75,29 @@ function UploadPage() {
       }
     } finally {
       setIsProcessing(false);
-      console.log("Upload and process finished.");
     }
   };
 
   return (
     <div className={styles.pageContainer}>
-      <h2 className={styles.title}>Censor Your Video</h2>
+      <h2 className={styles.title}>Make It PG</h2>
+      <p className={styles.subtitle}>Upload a video and let our AI remove the bad words. Get a clean, safe version in seconds!</p>
+
       <div className={styles.uploadContainer}>
-        <input type="file" accept="video/mp4" onChange={handleFileChange} className={styles.fileInput} />
-        <button onClick={handleUpload} disabled={isProcessing || !videoFile} className={styles.uploadButton}>
-          {isProcessing ? "Upload & Process" : "Upload & Process"}
+        <input
+          type="file"
+          accept="video/mp4"
+          onChange={handleFileChange}
+          className={styles.fileInput}
+        />
+        <button
+          onClick={handleUpload}
+          disabled={isProcessing || !videoFile}
+          className={styles.uploadButton}
+        >
+          {isProcessing ? "Uploading..." : "Upload & Process"}
         </button>
+
         {isProcessing && <div className={styles.processingMessage}>Processing your video, please wait...</div>}
         {uploadError && <div className={styles.errorMessage}>{uploadError}</div>}
       </div>
